@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-vault
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vault-busybox.labels" . | nindent 4 }}
+    component: vault
+spec:
+  replicas: {{ .Values.vault.replicas }}
+  selector:
+    matchLabels:
+      {{- include "vault-busybox.selectorLabels" . | nindent 6 }}
+      component: vault
+  template:
+    metadata:
+      labels:
+        {{- include "vault-busybox.selectorLabels" . | nindent 8 }}
+        component: vault
+    spec:
+      containers:
+        - name: vault
+          image: {{ .Values.vault.image }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.vault.ports.http }}
+              name: http
+            - containerPort: {{ .Values.vault.ports.cluster }}
+              name: cluster
+          env:
+            - name: VAULT_LOCAL_CONFIG
+              value: |
+                {
+                  "listener": {
+                    "tcp": {
+                      "address": "0.0.0.0:8200",
+                      "tls_disable": 1
+                    }
+                  },
+                  "storage": {
+                    "file": {
+                      "path": "/vault/data"
+                    }
+                  },
+                  "ui": {{ .Values.vault.ui.enabled }}
+                }
+            - name: VAULT_ADDR
+              value: "http://127.0.0.1:8200"
+          volumeMounts:
+            - name: vault-data
+              mountPath: /vault/data
+          resources:
+            {{- toYaml .Values.vault.resources | nindent 12 }}
+          securityContext:
+            capabilities:
+              add:
+                - IPC_LOCK
+      volumes:
+        - name: vault-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-vault-pvc

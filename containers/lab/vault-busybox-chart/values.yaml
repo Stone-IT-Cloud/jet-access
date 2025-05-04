@@ -1,0 +1,50 @@
+# Configuración global
+global:
+  namespace: vault
+  labels:
+    app: vault-busybox
+
+# Configuración de Vault
+vault:
+  image: hashicorp/vault:1.15.2
+  replicas: 1
+  ports:
+    http: 8200
+    cluster: 8201
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  storage:
+    size: 10Gi
+    storageClass: standard
+  ui:
+    enabled: true
+  config:
+    listener:
+      tcp:
+        address: "0.0.0.0:8200"
+        tls_disable: 1
+    storage:
+      file:
+        path: "/vault/data"
+
+# Configuración de BusyBox
+busybox:
+  image: busybox:1.36.1
+  nameOverride: "hello-host"
+  replicas: 2
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+  command:
+    - sh
+    - -c
+    - "while true; do echo Hello from $(hostname) at $(date); sleep 300; done"
