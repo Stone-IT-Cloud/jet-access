@@ -1,0 +1,77 @@
+repos:
+  # Terraform formatting and validation
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.83.5
+    hooks:
+      - id: terraform_fmt
+        description: 'Reformats all Terraform configuration files to a canonical format'
+      - id: terraform_validate
+        description: 'Validates all Terraform configuration files'
+      - id: terraform_tflint
+        description: 'TFLint is a Terraform linter for detecting errors and best practices'
+        args:
+          - --args=--call-module-type=all  # Cambia --module por --call-module-type=all
+          - --args=--config=__GIT_WORKING_DIR__.tflint.hcl --recursive
+      - id: terraform_docs
+        description: 'Inserts input and output documentation into README.md'
+        args:
+          - --hook-config=--path-to-file=infrastructure/README.md
+          - --hook-config=--add-to-existing-file=true
+      - id: terraform_checkov
+        description: 'Runs checkov security scanner for Terraform'
+        args:
+          - --args=--framework=terraform
+
+  # Go formatting
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: v0.5.1
+    hooks:
+      - id: go-fmt
+        description: 'Runs gofmt on Go files'
+        files: '\.go$'
+        exclude: '^vendor/'
+      - id: go-vet
+        description: 'Runs go vet on Go files'
+        name: go-vet
+        entry: go vet
+        language: system
+        types: [go]
+        pass_filenames: false
+        args: ['./cmd/...', './internal/...', './pkg/...']  # Especifica rutas explícitamente
+      - id: go-imports
+        description: 'Runs goimports on Go files'
+        files: '\.go$'
+        exclude: '^vendor/'
+      - id: go-lint
+        description: 'Runs golint on Go files'
+        files: '\.go$'
+        exclude: '^vendor/'
+        args: ['./cmd/...', './internal/...', './pkg/...']  # Especifica rutas explícitamente
+      - id: go-unit-tests
+        description: 'Runs go test with race detection'
+        args: [-race, './cmd/...', './internal/...', './pkg/...']  # Incluye rutas también aquí
+      - id: golangci-lint
+        description: 'Run golangci-lint on Go packages'
+        args: [--config=.golangci.yml, --fix, './cmd/...', './internal/...', './pkg/...']
+        verbose: true
+
+  # Basic file checks and cleanup
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        exclude: '^containers/lab/vault-busybox-chart/'
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: detect-private-key
+      - id: check-merge-conflict
+
+  # Commit message validation
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.12.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
