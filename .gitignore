@@ -27,3 +27,6 @@ go.work.sum
 containers/lab/vault-busybox-chart/charts/*
 infrastructure/tf/keys/*
 NOTES.md
+infrastructure/tf/terraform.tfstate.*
+infrastructure/tf/terraform.tfstate
+infrastructure/tf/*.tfvars
