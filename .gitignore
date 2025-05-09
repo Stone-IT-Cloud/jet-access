@@ -31,3 +31,4 @@ infrastructure/tf/terraform.tfstate.*
 infrastructure/tf/terraform.tfstate
 infrastructure/tf/*.tfvars
 infrastructure/tf/.terraform/*
+infrastructure/tf/vault/.terraform/*
