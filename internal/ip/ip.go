@@ -2,6 +2,7 @@ package ip
 
 import "fmt"
 
-func Ip() {
+// IP prints "Hello, World!" to standard output.
+func IP() {
 	fmt.Println("Hello, World!")
 }

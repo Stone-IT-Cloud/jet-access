@@ -15,7 +15,7 @@ import (
 type SSHConfig struct {
 	Address    string // Target server address (e.g., "hostname:port" or "ip:port")
 	User       string // SSH username
-	Port	   string
+	Port       string
 	Key        []byte // Optional: Content of the private SSH key (can be nil or empty)
 	Passphrase string // Optional: Passphrase for the private key (can be empty)
 	Password   string // Optional: Password for password authentication (can be empty, alternative to Key)
@@ -43,16 +43,16 @@ func ConnectAndShell(cfg SSHConfig) error {
 				}
 
 			} else {
-				 // If no passphrase was provided or passphrase also failed
-				 return fmt.Errorf("failed to parse private key: %w", err)
-            }
+				// If no passphrase was provided or passphrase also failed
+				return fmt.Errorf("failed to parse private key: %w", err)
+			}
 		}
 		authMethods = append(authMethods, ssh.PublicKeys(signer))
 	}
 
 	// Add password authentication if password is provided (Key takes precedence if both exist)
 	// A real-world scenario might prioritize key auth, but this adds password if key isn't used.
-    // You might adjust this logic based on your Vault secret structure and priority.
+	// You might adjust this logic based on your Vault secret structure and priority.
 	if cfg.Password != "" {
 		authMethods = append(authMethods, ssh.Password(cfg.Password))
 	}
@@ -96,17 +96,17 @@ func ConnectAndShell(cfg SSHConfig) error {
 	fd := int(os.Stdin.Fd())
 	// Check if the terminal is interactive
 	if term.IsTerminal(fd) {
-        // Put the terminal in raw mode to handle shell input correctly
+		// Put the terminal in raw mode to handle shell input correctly
 		oldState, err := term.MakeRaw(fd)
 		if err != nil {
 			log.Printf("Warning: Could not set terminal to raw mode: %v. Interactive shell features may be limited.", err)
-             // Continue without raw mode, but warn the user
+			// Continue without raw mode, but warn the user
 		} else {
-            // Restore the terminal state when the function exits
-            defer term.Restore(fd, oldState)
-        }
+			// Restore the terminal state when the function exits
+			defer term.Restore(fd, oldState)
+		}
 
-        // Get the terminal size to inform the remote session
+		// Get the terminal size to inform the remote session
 		width, height, err := term.GetSize(fd)
 		if err != nil {
 			log.Printf("Warning: Could not get terminal size: %v", err)
@@ -125,10 +125,9 @@ func ConnectAndShell(cfg SSHConfig) error {
 		}
 
 	} else {
-         log.Println("Stdin is not a terminal. Running in non-interactive mode.")
-         // No PTY requested for non-interactive input
-    }
-
+		log.Println("Stdin is not a terminal. Running in non-interactive mode.")
+		// No PTY requested for non-interactive input
+	}
 
 	// --- 6. Connect Standard I/O Streams ---
 	// Connect local standard input to the remote session's standard input
@@ -148,12 +147,12 @@ func ConnectAndShell(cfg SSHConfig) error {
 	// --- 8. Wait for the Session to End ---
 	// This blocks until the remote shell session is closed (e.g., user types 'exit', connection drops)
 	if err := session.Wait(); err != nil {
-        // Check if the error is just a non-zero exit status from the remote command/shell
-        if exitErr, ok := err.(*ssh.ExitError); ok {
-             log.Printf("Session ended with non-zero exit status: %d", exitErr.ExitStatus())
-             // Depending on requirements, you might return this error or nil
-             return nil // Often, a non-zero shell exit isn't treated as a tool failure
-        }
+		// Check if the error is just a non-zero exit status from the remote command/shell
+		if exitErr, ok := err.(*ssh.ExitError); ok {
+			log.Printf("Session ended with non-zero exit status: %d", exitErr.ExitStatus())
+			// Depending on requirements, you might return this error or nil
+			return nil // Often, a non-zero shell exit isn't treated as a tool failure
+		}
 		return fmt.Errorf("SSH session ended with unexpected error: %w", err)
 	}
 

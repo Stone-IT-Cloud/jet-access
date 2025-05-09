@@ -31,17 +31,20 @@ func generateTestKey(bits int, passphrase []byte) ([]byte, []byte, error) {
 	var pemBlock *pem.Block
 	privBytes := x509.MarshalPKCS1PrivateKey(privateKey)
 
+	var privatePEM []byte
 	if len(passphrase) > 0 {
-		//lint:ignore SA1019 we need this cipher for testing compatibility potentially
-		pemBlock, err = x509.EncryptPEMBlock(rand.Reader, "RSA PRIVATE KEY", privBytes, passphrase, x509.PEMCipherAES256)
+		// Para compatibilidad con versiones anteriores de Go, usamos EncryptPEMBlock
+		// aunque esté obsoleto (seguro para pruebas)
+		//nolint:staticcheck // Usamos función obsoleta intencionalmente por compatibilidad
+		pemBlock, err := x509.EncryptPEMBlock(rand.Reader, "RSA PRIVATE KEY", privBytes, passphrase, x509.PEMCipherAES256)
 		if err != nil {
-			return nil, nil, fmt.Errorf("failed to encrypt PEM block: %w", err)
+			return nil, nil, fmt.Errorf("failed to encrypt private key: %w", err)
 		}
+		privatePEM = pem.EncodeToMemory(pemBlock)
 	} else {
 		pemBlock = &pem.Block{Type: "RSA PRIVATE KEY", Bytes: privBytes}
+		privatePEM = pem.EncodeToMemory(pemBlock)
 	}
-
-	privatePEM := pem.EncodeToMemory(pemBlock)
 
 	// Generate public key in authorized_keys format
 	pubKey, err := gossh.NewPublicKey(&privateKey.PublicKey)
@@ -245,7 +248,7 @@ func TestConnectAndShell_Integration(t *testing.T) {
 	tests := []struct {
 		name           string
 		cfg            SSHConfig
-		input          string // Commands to send to the shell via Stdin
+		input          string   // Commands to send to the shell via Stdin
 		expectOutput   []string // Substrings expected in Stdout
 		expectError    bool
 		errorContains  string
