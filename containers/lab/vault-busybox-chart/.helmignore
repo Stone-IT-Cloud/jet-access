@@ -1,0 +1,29 @@
+# Patrones para ignorar al empaquetar Helm charts
+
+# Archivos comunes de control de versiones
+.git/
+.gitignore
+.bzr/
+.bzrignore
+.hg/
+.hgignore
+.svn/
+
+# Archivos de desarrollador comunes
+*.swp
+*.bak
+*.tmp
+*.orig
+*~
+.project
+.idea/
+*.tmproj
+.vscode/
+*.sublime-*
+
+# OWNERS file para Kubernetes
+OWNERS
+
+# No ignorar dependencias descargadas
+# charts/*
+# !charts/.gitkeep

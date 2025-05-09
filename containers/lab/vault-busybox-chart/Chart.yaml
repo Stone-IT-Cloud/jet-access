@@ -6,3 +6,7 @@ version: 0.1.0
 appVersion: "1.0.0"
 maintainers:
   - name: Stone IT Cloud
+dependencies:
+  - name: vault
+    version: "0.30.0" # Using a recent stable version of the official chart
+    repository: "https://helm.releases.hashicorp.com"

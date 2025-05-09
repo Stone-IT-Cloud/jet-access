@@ -4,35 +4,57 @@ global:
   labels:
     app: vault-busybox
 
-# Configuración de Vault
+# Configuración de Vault (Usando el subchart oficial de HashiCorp)
 vault:
-  image: hashicorp/vault:1.15.2
-  replicas: 1
-  ports:
-    http: 8200
-    cluster: 8201
-  resources:
-    requests:
-      cpu: 100m
-      memory: 256Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
-  storage:
-    size: 10Gi
-    storageClass: standard
+  # Habilita el despliegue del servidor Vault a través del subchart
+  server:
+    enabled: true
+    # Configuración del servicio principal del servidor Vault
+    service:
+      type: NodePort # Exponer el servicio principal como NodePort
+      # El puerto 8200 será accesible a través del NodePort asignado
+    # Configuración de recursos para el pod de Vault
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    # Configuración de persistencia (equivalente al PVC anterior)
+    dataStorage:
+      enabled: true
+      size: 1Gi
+      storageClass: standard # Asegúrate que esta clase exista o ajústala
+    # Configuración específica de Vault (similar al ConfigMap anterior)
+    # Referencia: https://developer.hashicorp.com/vault/docs/configuration
+    config: |
+      ui = true
+      listener "tcp" {
+        address     = "0.0.0.0:8200"
+        cluster_address = "0.0.0.0:8201"
+        tls_disable = "true" # Deshabilitar TLS como en la configuración original
+      }
+      storage "file" {
+        path = "/vault/data" # El chart monta el volumen aquí
+      }
+      # api_addr = "http://{{ .Release.Name }}-vault-ui:8200" # Puede ser necesario si el cluster_addr no es suficiente
+      # cluster_addr = "http://{{ .Release.Name }}-vault-internal:8201" # Ajustar según el nombre del servicio headless del chart
+
+  # Configuración de la UI de Vault
   ui:
     enabled: true
-  config:
-    listener:
-      tcp:
-        address: "0.0.0.0:8200"
-        tls_disable: 1
-    storage:
-      file:
-        path: "/vault/data"
+    # Configuración del servicio para la UI - Dejar que el chart lo maneje o herede del server.service
+    # service:
+    #   type: NodePort # Comentado o eliminado, probaremos con server.service.type
 
-# Configuración de BusyBox
+  # Deshabilitar otros componentes del chart oficial si no se necesitan
+  injector:
+    enabled: false
+  csi:
+    enabled: false
+
+# Configuración de BusyBox (sin cambios)
 busybox:
   image: busybox:1.36.1
   nameOverride: "hello-host"
