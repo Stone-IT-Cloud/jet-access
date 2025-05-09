@@ -26,3 +26,4 @@ go.work.sum
 .vscode/settings.json
 containers/lab/vault-busybox-chart/charts/*
 infrastructure/tf/keys/*
+NOTES.md
