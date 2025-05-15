@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-busybox
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "vault-busybox.labels" . | nindent 4 }}
+    component: busybox
+spec:
+  replicas: {{ .Values.busybox.replicas }}
+  selector:
+    matchLabels:
+      {{- include "vault-busybox.selectorLabels" . | nindent 6 }}
+      component: busybox
+  template:
+    metadata:
+      labels:
+        {{- include "vault-busybox.selectorLabels" . | nindent 8 }}
+        component: busybox
+    spec:
+      containers:
+        - name: busybox
+          image: {{ .Values.busybox.image }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 22
+              name: ssh
+          command:
+            {{- toYaml .Values.busybox.command | nindent 12 }}
+          resources:
+            {{- toYaml .Values.busybox.resources | nindent 12 }}

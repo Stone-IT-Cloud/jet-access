@@ -2,6 +2,7 @@ package ui
 
 import "fmt"
 
-func Ui() {
+// UI prints "Hello, World!" to the standard output.
+func UI() {
 	fmt.Println("Hello, World!")
 }

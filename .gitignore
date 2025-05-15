@@ -23,3 +23,12 @@ go.work.sum
 
 # env file
 .env
+.vscode/settings.json
+containers/lab/vault-busybox-chart/charts/*
+infrastructure/tf/keys/*
+NOTES.md
+infrastructure/tf/terraform.tfstate.*
+infrastructure/tf/terraform.tfstate
+infrastructure/tf/*.tfvars
+infrastructure/tf/.terraform/*
+infrastructure/tf/vault/.terraform/*

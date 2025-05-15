@@ -9,9 +9,9 @@ import (
 
 func main() {
 	fmt.Println("Hello, World!")
-	ssh_config := ssh.SSHConfig{
+	sshConfig := ssh.SSHConfig{
 		Address: "45.55.41.188:22",
-		User: "root",
+		User:    "root",
 	}
 	// Get home directory
 	homeDir, err := os.UserHomeDir()
@@ -19,15 +19,15 @@ func main() {
 		fmt.Printf("Error getting home directory: %v\n", err)
 		return
 	}
-	
+
 	// Read the SSH key file
-	ssh_key, err := os.ReadFile(homeDir + "/.ssh/id_rsa")
+	sshKey, err := os.ReadFile(homeDir + "/.ssh/id_rsa")
 	if err != nil {
 		fmt.Printf("Error reading SSH key file: %v\n", err)
 		return
 	}
-	ssh_config.Key = ssh_key
-	err = ssh.ConnectAndShell(ssh_config)
+	sshConfig.Key = sshKey
+	err = ssh.ConnectAndShell(sshConfig)
 	if err != nil {
 		fmt.Printf("Error connecting to SSH: %v\n", err)
 	}
