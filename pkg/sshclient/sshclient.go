@@ -103,7 +103,12 @@ func ConnectAndShell(cfg SSHConfig) error {
 			// Continue without raw mode, but warn the user
 		} else {
 			// Restore the terminal state when the function exits
-			defer term.Restore(fd, oldState)
+			defer func() {
+				err := term.Restore(fd, oldState)
+				if err != nil {
+					log.Printf("Warning: Failed to restore terminal: %v", err)
+				}
+			}()
 		}
 
 		// Get the terminal size to inform the remote session
