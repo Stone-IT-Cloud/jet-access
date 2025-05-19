@@ -15,5 +15,3 @@ linters-settings:
     check-type-assertions: true
 
 linters:
-  disable:
-    - errcheck  # Desactivamos temporalmente este linter para resolver el problema
