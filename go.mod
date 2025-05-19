@@ -11,4 +11,5 @@ require (
 require (
 	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be // indirect
 	golang.org/x/sys v0.32.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

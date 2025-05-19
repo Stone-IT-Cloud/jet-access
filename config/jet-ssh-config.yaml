@@ -1,0 +1,51 @@
+# Vault Configuration
+# This file contains the connection parameters for HashiCorp Vault
+# Different environments can be configured by setting the VAULT_ENV environment variable
+
+default: &default
+  # Vault server address
+  address: "http://localhost:8200"
+  # Vault token for authentication
+  token: ""
+  # TLS configuration
+  tls:
+    verify: true
+    ca_cert: ""
+    client_cert: ""
+    client_key: ""
+  # Timeout settings
+  timeout: 30
+  # Retry settings
+  retry:
+    max_attempts: 3
+    initial_interval: 1
+    max_interval: 10
+
+environments:
+  development:
+    <<: *default
+    address: "http://localhost:8200"
+  token: "dev-token"
+
+  staging:
+    <<: *default
+    address: "https://vault.staging.example.com"
+    token: "staging-token"
+    tls:
+      verify: true
+      ca_cert: "/path/to/staging/ca.crt"
+
+  production:
+    <<: *default
+    address: "https://vault.production.example.com"
+    token: "production-token"
+    tls:
+      verify: true
+      ca_cert: "/path/to/production/ca.crt"
+      client_cert: "/path/to/production/client.crt"
+      client_key: "/path/to/production/client.key"
+    timeout: 60
+    retry:
+      max_attempts: 5
+      initial_interval: 2
+      max_interval: 30
